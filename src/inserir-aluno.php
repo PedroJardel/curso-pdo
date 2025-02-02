@@ -1,5 +1,8 @@
 <?php
 
+namespace PedroLima\CursoPdo;
+
+use DateTimeImmutable;
 use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 use PedroLima\CursoPdo\Model\Student;
 
@@ -15,8 +18,8 @@ $pdo = ConnectionCreator::createConnection();
 
 $sqlInsert = "INSERT INTO students (name, birth_date) VALUES (:name, :birth_date);";
 $statement= $pdo->prepare($sqlInsert);
-$statement->bindValue(':name', $student->name);
-$statement->bindValue(':birth_date', $student->birthDate->format("Y-m-d"));
+$statement->bindValue(':name', $student->name());
+$statement->bindValue(':birth_date', $student->birthDate()->format("Y-m-d"));
 
 if($statement->execute()) {
     echo "Aluno incluido!";

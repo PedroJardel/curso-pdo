@@ -1,5 +1,9 @@
 <?php
 
+namespace PedroLima\CursoPdo;
+
+use DateTimeImmutable;
+use PDO;
 use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 use PedroLima\CursoPdo\Model\Student;
 

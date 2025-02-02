@@ -8,11 +8,37 @@ use DomainException;
 
 class Student
 {
-    public function __construct(
-        public readonly ?int $id,
-        public readonly string $name,
-        public readonly DateTimeInterface $birthDate
-    ) {}
+    private ?int $id;
+    private string $name;
+    private DateTimeInterface $birthDate;
+    
+    /**
+     * Summary of phones
+     * @var Phone[]
+     */
+    private array $phones = [];
+    public function __construct(?int $id, string $name, DateTimeInterface $birthDate)
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->birthDate = $birthDate;
+    }
+
+    public function id(): ?int
+    {
+        return $this->id;
+    }
+
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+    public function birthDate(): DateTimeImmutable
+    {
+        return $this->birthDate;
+    }
+   
     public function defineId($id): void
     {
         if (!is_null($this->id)) {
@@ -30,5 +56,19 @@ class Student
         return $this->birthDate
             ->diff(new DateTimeImmutable())
             ->y;
+    }
+
+    public function addphone(Phone $phone): void
+    {
+        $this->phones[] = $phone;
+    }
+
+    /**
+     * Summary of phones
+     * @return Phone[]
+     */
+    public function phones(): array
+    {
+        return $this->phones;
     }
 }

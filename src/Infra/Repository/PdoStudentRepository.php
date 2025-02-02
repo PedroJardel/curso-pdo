@@ -8,6 +8,7 @@ use PDO;
 use PDOStatement;
 use PedroLima\CursoPdo\Model\Student;
 use PedroLima\CursoPdo\Repository\StudentRepository;
+use RuntimeException;
 
 class PdoStudentRepository implements StudentRepository
 {
@@ -33,7 +34,7 @@ class PdoStudentRepository implements StudentRepository
 
     private function hydrateStudentList(PDOStatement $statement): array
     {
-        $studentDataList = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $studentDataList = $statement->fetchAll();
         $studentList = [];
         foreach ($studentDataList as $studentData) {
             $studentList[] = new Student(
@@ -47,7 +48,7 @@ class PdoStudentRepository implements StudentRepository
 
     public function save(Student $student): bool
     {
-        if ($student->id === null) {
+        if ($student->id() === null) {
             return $this->insert($student);
         }
         return $this->update($student);
@@ -55,11 +56,11 @@ class PdoStudentRepository implements StudentRepository
 
     private function insert(Student $student): bool
     {
-        $statement = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (:name, :birth_date, :id);');
+        $statement = $this->connection->prepare('INSERT INTO students (name, birth_date) VALUES (:name, :birth_date);');
 
         $success = $statement->execute([
-            ':name' => $student->name,
-            ':birth_date' => $student->birthDate->format('Y-m-d')
+            ':name' => $student->name(),
+            ':birth_date' => $student->birthDate()->format('Y-m-d')
         ]);
 
         if ($success) {
@@ -72,9 +73,9 @@ class PdoStudentRepository implements StudentRepository
     private function update(Student $student): bool
     {
         $statement = $this->connection->prepare('UPDATE students SET name = :name, birth_date = :birth_date WHERE id = :id;');
-        $statement->bindValue(':name', $student->name);
-        $statement->bindValue(':birth_date', $student->birthDate->format("Y-m-d"));
-        $statement->bindValue(':id', $student->id, PDO::PARAM_INT);
+        $statement->bindValue(':name', $student->name());
+        $statement->bindValue(':birth_date', $student->birthDate()->format("Y-m-d"));
+        $statement->bindValue(':id', $student->id(), PDO::PARAM_INT);
 
         return $statement->execute();
     }
@@ -82,7 +83,7 @@ class PdoStudentRepository implements StudentRepository
     public function remove(Student $student): bool
     {
         $preparedStatement = $this->connection->prepare('DELETE FROM students WHERE id = ?;');
-        $preparedStatement->bindValue(1, $student->id, PDO::PARAM_INT);
+        $preparedStatement->bindValue(1, $student->id(), PDO::PARAM_INT);
         return $preparedStatement->execute();
     }
 }

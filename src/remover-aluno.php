@@ -1,5 +1,8 @@
 <?php
 
+namespace PedroLima\CursoPdo;
+
+use PDO;
 use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 
 require_once 'vendor/autoload.php';
