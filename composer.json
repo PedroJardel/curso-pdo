@@ -1,0 +1,17 @@
+{
+    "name": "pedro-lima/curso-pdo",
+    "description": "Curso voltado para a integração do código backend com banco de dados SQLite e MySQL",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "PedroLima\\CursoPdo\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pedro Lima",
+            "email": "pedrozagolima@gmail.com"
+        }
+    ],
+    "require": {}
+}
