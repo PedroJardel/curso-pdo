@@ -2,42 +2,18 @@
 
 namespace PedroLima\CursoPdo;
 
-use DateTimeImmutable;
-use PDO;
-use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
-use PedroLima\CursoPdo\Model\Student;
+require_once dirname(__DIR__, 1) ."/vendor/autoload.php";
 
-require_once 'vendor/autoload.php';
+use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
+use PedroLima\CursoPdo\Infra\Repository\PdoStudentRepository;
 
 $pdo = ConnectionCreator::createConnection();
 
-$statement = $pdo->query('SELECT * FROM students;');
-$studentDataList = $statement->fetchAll(PDO::FETCH_ASSOC);
-$studentList = [];
+$repository = new PdoStudentRepository($pdo);
 
-foreach ($studentDataList as $key => $studentData) {
-    $studentList[] = new Student (
-        $studentData['id'],
-        $studentData['name'],
-        new DateTimeImmutable($studentData['birth_date']),
-    );
-}
+$studentList = $repository->findAll();
 
-$statement2 = $pdo->query('SELECT * FROM students WHERE id = 1;');
-$student = $statement2->fetch(PDO::FETCH_ASSOC);
-
-
-while($studentData = $statement2->fetch(PDO::FETCH_ASSOC)) {
-    $student[] = new Student (
-        $studentData['id'],
-        $studentData['name'],
-        new DateTimeImmutable($studentData['birth_date']),
-    );
-
-    echo $student->age() . PHP_EOL;
-}
-
-var_dump($student);
+var_dump($studentList);
 
 
 

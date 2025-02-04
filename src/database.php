@@ -2,9 +2,9 @@
 
 namespace PedroLima\CursoPdo;
 
-use \PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
+require_once dirname(__DIR__, 1) ."/vendor/autoload.php";
 
-require_once 'vendor/autoload.php';
+use \PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 
 $pdo = ConnectionCreator::createConnection();
 

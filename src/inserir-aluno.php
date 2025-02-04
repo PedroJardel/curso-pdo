@@ -2,11 +2,11 @@
 
 namespace PedroLima\CursoPdo;
 
+require_once dirname(__DIR__, 1) ."/vendor/autoload.php";
+
 use DateTimeImmutable;
 use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 use PedroLima\CursoPdo\Model\Student;
-
-require_once'vendor/autoload.php';
 
 $student = new Student(
     null,

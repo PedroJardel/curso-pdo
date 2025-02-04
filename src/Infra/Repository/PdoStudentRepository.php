@@ -6,9 +6,9 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use PDO;
 use PDOStatement;
+use PedroLima\CursoPdo\Model\Phone;
 use PedroLima\CursoPdo\Model\Student;
 use PedroLima\CursoPdo\Repository\StudentRepository;
-use RuntimeException;
 
 class PdoStudentRepository implements StudentRepository
 {
@@ -19,7 +19,8 @@ class PdoStudentRepository implements StudentRepository
     }
     public function findAll(): array
     {
-        $statement = $this->connection->prepare("SELECT * FROM students;");
+        $sqlQuery = "SELECT * FROM students;";
+        $statement = $this->connection->prepare($sqlQuery);
         return $this->hydrateStudentList($statement);
     }
 
@@ -37,13 +38,35 @@ class PdoStudentRepository implements StudentRepository
         $studentDataList = $statement->fetchAll();
         $studentList = [];
         foreach ($studentDataList as $studentData) {
-            $studentList[] = new Student(
+            $student = new Student(
                 $studentData["id"],
                 $studentData["name"],
                 new DateTimeImmutable($studentData["birth_date"]),
             );
+            $this->fillPhonesOf($student);
+            $studentList[] = $student;
         }
         return $studentList;
+    }
+
+    private function fillPhonesOf(Student $student): void
+    {
+        $sqlQuery = "SELECT id, area_code, number FROM phones WHERE student_id = ?;";
+        $statement = $this->connection->prepare($sqlQuery);
+        $statement->bindValue(1, $student->id(), PDO::PARAM_INT);
+        $statement->execute();
+
+        $phoneDataList = $statement->fetchAll();
+
+        foreach( $phoneDataList as $phoneData) {
+            $phone = new Phone(
+                $phoneData['id'],
+                $phoneData['area_code'],
+                $phoneData['number'],
+            );
+
+            $student->addphone($phone);
+        }
     }
 
     public function save(Student $student): bool

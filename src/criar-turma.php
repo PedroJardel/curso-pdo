@@ -2,13 +2,13 @@
 
 namespace PedroLima\CursoPdo;
 
+require_once dirname(__DIR__, 1) ."/vendor/autoload.php";
+
 use DateTimeImmutable;
 use PDOException;
 use PedroLima\CursoPdo\Infra\Persistence\ConnectionCreator;
 use PedroLima\CursoPdo\Infra\Repository\PdoStudentRepository;
 use PedroLima\CursoPdo\Model\Student;
-
-require_once 'vendor/autoload.php';
 
 $connection = ConnectionCreator::createConnection();
 $studentRespository = new PdoStudentRepository($connection);
