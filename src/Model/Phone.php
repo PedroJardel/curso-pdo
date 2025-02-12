@@ -14,21 +14,7 @@ class Phone
         $this->areaCode = $areaCode;
         $this->number = $number;
     }
-    public function id(): ?int
-    {
-        return $this->id;
-    }
-
-    public function areaCode(): string
-    {
-        return $this->areaCode;
-    }
-
-    public function number(): string
-    {
-        return $this->number;
-    }
-
+    
     public function formattedPhone(): string
     {
         return "($this->areaCode) $this->number";

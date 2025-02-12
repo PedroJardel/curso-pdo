@@ -20,13 +20,14 @@ class PdoStudentRepository implements StudentRepository
     public function findAll(): array
     {
         $sqlQuery = "SELECT * FROM students;";
-        $statement = $this->connection->prepare($sqlQuery);
+        $statement = $this->connection->query($sqlQuery);
         return $this->hydrateStudentList($statement);
     }
 
     public function studentBirthAt(DateTimeInterface $birthDate): array
     {
-        $statement = $this->connection->query('SELECT * FROM students WHERE birth_date = :birth_date;');
+        $sqlQuery = "SELECT * FROM students WHERE birth_date = :birth_date;";
+        $statement = $this->connection->prepare($sqlQuery);
         $statement->bindValue(':birth_date', $birthDate->format("Y-m-d"));
         $statement->execute();
 
@@ -38,35 +39,13 @@ class PdoStudentRepository implements StudentRepository
         $studentDataList = $statement->fetchAll();
         $studentList = [];
         foreach ($studentDataList as $studentData) {
-            $student = new Student(
-                $studentData["id"],
-                $studentData["name"],
-                new DateTimeImmutable($studentData["birth_date"]),
+            $studentList[] = new Student(
+                $studentData['id'],
+                $studentData['name'],
+                new DateTimeImmutable($studentData['birth_date']),
             );
-            $this->fillPhonesOf($student);
-            $studentList[] = $student;
         }
         return $studentList;
-    }
-
-    private function fillPhonesOf(Student $student): void
-    {
-        $sqlQuery = "SELECT id, area_code, number FROM phones WHERE student_id = ?;";
-        $statement = $this->connection->prepare($sqlQuery);
-        $statement->bindValue(1, $student->id(), PDO::PARAM_INT);
-        $statement->execute();
-
-        $phoneDataList = $statement->fetchAll();
-
-        foreach( $phoneDataList as $phoneData) {
-            $phone = new Phone(
-                $phoneData['id'],
-                $phoneData['area_code'],
-                $phoneData['number'],
-            );
-
-            $student->addphone($phone);
-        }
     }
 
     public function save(Student $student): bool
@@ -108,5 +87,30 @@ class PdoStudentRepository implements StudentRepository
         $preparedStatement = $this->connection->prepare('DELETE FROM students WHERE id = ?;');
         $preparedStatement->bindValue(1, $student->id(), PDO::PARAM_INT);
         return $preparedStatement->execute();
+    }
+
+    public function studentsWithPhones(): array
+    {
+        $sqlQuery = 'SELECT std.id, std.name, std.birth_date, ph.id, ph.area_code, ph.number FROM students AS std JOIN phones AS ph ON std.id = ph.student_id;';
+        $statement = $this->connection->query($sqlQuery);
+        $result = $statement->fetchAll();
+        $studentList = [];
+
+        foreach ($result as $row) {
+            if (!array_key_exists($row['id'], $studentList)) {
+                $studentList[$row['id']] = new Student(
+                    $row['id'],
+                    $row['name'],
+                    new DateTimeImmutable($row['birth_date']),
+                );
+            }
+            $phone = new Phone(
+                $row['id'],
+                $row['area_code'],
+                $row['number'],
+            );
+            $studentList[$row['id']]->addPhone($phone);
+        }
+        return $studentList;
     }
 }
